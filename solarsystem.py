@@ -3,38 +3,27 @@ import pygame as pg
 from math import sin,cos,pi, radians
 from random import randrange, uniform
 
-WIDTH, HEIGHT = 1600, 900
+WIDTH, HEIGHT = 1600, 900 #Set size of windpw
 WIN = pg.display.set_mode((WIDTH, HEIGHT))
 
-pg.display.set_caption("Solar System")
+pg.display.set_caption("Solar System") #Name window
 
-FPS = 60
-
-BLACK = (0,0,0)
-RED = (255,0,0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
-YELLOW = (255,255,0)
-TEAL = (0,255,255)
-PURPLE = (255,0,255)
-WHITE = (255,255,255)
+FPS = 60 #Set desired FPS for clock
 
 def main(stars, satelites):
     clock = pg.time.Clock()
     run = True
     while run: # test if program has been quit
         clock.tick(FPS)
+
+        WIN.fill((0, 0, 0)) #Draw background
+        [star.generate(WIN) for star in stars] #Draw stars
+        [satelite.calculateMovement(WIN) for satelite in satelites] #Draw satelites
+        pg.display.update() #Update screen
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
-        draw_window(stars, satelites)
-
-def draw_window(stars, satelites):
-    WIN.fill((0, 0, 0)) # blank screen
-    [star.generate(WIN) for star in stars]
-    [satelite.calculateMovement(WIN) for satelite in satelites]
-    pg.display.update() # update screen
-
 
 class star():
     instances = []
@@ -79,9 +68,9 @@ for i in range(0,200):
     bg_stars = star(uniform(1.0,2.0)/10, randrange(0,WIDTH), randrange(0,HEIGHT), (randrange(220,255),randrange(220,255),randrange(220,255)))
 
     #the Sun
-sun = star(5, WIDTH/2, HEIGHT/2, YELLOW)
+sun = star(5, WIDTH/2, HEIGHT/2, (255,255,0))
 
-# satelites(orbitining, size, distance, velocity, colour)
+# planet satelites(orbitining, size, distance, velocity, colour)
 mercury = satelite(sun, 1, 1, -48, (219,206,202))
 venus = satelite(sun, 3, 2, 35, (150,131,150))
 earth = satelite(sun, 4, 3, 30, (0,0,205))
@@ -91,7 +80,7 @@ saturn = satelite(sun, 7, 7, -10, (206,184,184))
 uranus = satelite(sun, 6, 8, -7, (213,251,252))
 neptune = satelite(sun, 5, 9, 5, (91,93,223))
 
-# moons(orbitining, size, distance, velocity, colour)
+# moon satelites(orbitining, size, distance, velocity, colour)
     #mercury
 venus_moon = satelite(mercury, 0.6, 0.1, 200, (150,131,150))
     #venus
