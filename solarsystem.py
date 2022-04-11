@@ -84,13 +84,6 @@ for i in range(0,2000):
 
 
 if __name__ == '__main__':
-    
-    
-    
-    
-    
-    
-    
     clock = pg.time.Clock()
     run = True
     while run: # test if program has been quit
