@@ -1,0 +1,13 @@
+{
+    "Screen": {
+        "Title": "Solar System Simulation",
+        "FPS": 60,
+        "Width": 1600,
+        "Height": 840
+    },
+    "Scales": {
+        "Size": 0.1,
+        "Distance": 0.2,
+        "Velocity": 0.01
+    }
+}

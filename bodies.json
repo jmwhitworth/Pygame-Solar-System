@@ -1,0 +1,51 @@
+{
+    "Stars": {
+        "Sun": {
+            "Name": "Sun",
+            "Size": 50,
+            "Position": {
+                "x": 800,
+                "y": 400
+            },
+            "Colour": {
+                "r": 255,
+                "g": 255,
+                "b": 0
+            }
+        }
+    },
+    "Planets": {
+        "Earth": {
+            "Name": "Earth",
+            "Orbits": "Sun",
+            "Size": 50,
+            "Distance": 100,
+            "Velocity": 10,
+            "Colour": {
+                "r": 0,
+                "g": 0,
+                "b": 255
+            }
+        }
+    },
+    "Moons": {
+        "Moon": {
+            "Name": "Moon",
+            "Orbits": "Earth",
+            "Size": 20,
+            "Distance": 100,
+            "Velocity": -5,
+            "Colour": {
+                "r": 50,
+                "g": 50,
+                "b": 50
+            }
+        }
+    },
+    "Asteroids": {
+        "Count": 0
+    },
+    "Background Stars": {
+        "Count": 0
+    }
+}
