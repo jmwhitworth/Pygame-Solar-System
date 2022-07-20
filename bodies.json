@@ -2,15 +2,15 @@
     "Stars": {
         "Sun": {
             "Name": "Sun",
-            "Size": 50,
+            "Size": 696340000,
             "Position": {
                 "x": 800,
                 "y": 400
             },
             "Colour": {
-                "r": 255,
-                "g": 255,
-                "b": 0
+                "r": 252,
+                "g": 229,
+                "b": 112
             }
         }
     },
@@ -18,13 +18,13 @@
         "Earth": {
             "Name": "Earth",
             "Orbits": "Sun",
-            "Size": 50,
-            "Distance": 100,
-            "Velocity": 10,
+            "Size": 6371000,
+            "Distance": 152020000000,
+            "Velocity": 1000,
             "Colour": {
-                "r": 0,
-                "g": 0,
-                "b": 255
+                "r": 50,
+                "g": 50,
+                "b": 250
             }
         }
     },
@@ -32,9 +32,9 @@
         "Moon": {
             "Name": "Moon",
             "Orbits": "Earth",
-            "Size": 20,
-            "Distance": 100,
-            "Velocity": -5,
+            "Size": 1737400,
+            "Distance": 384400000,
+            "Velocity": 2300,
             "Colour": {
                 "r": 50,
                 "g": 50,
