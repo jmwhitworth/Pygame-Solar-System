@@ -1,100 +1,246 @@
 from math           import sin, cos, pi, radians
 from random         import randrange, uniform
 import pygame       as pg
-import sys
+import json
 
 
-WIDTH, HEIGHT = 1600, 900
-WIN = pg.display.set_mode((WIDTH, HEIGHT))
-pg.display.set_caption("Solar System")
-FPS = 60
+#LOAD OUR JSON CONFIG FILES
+with open("settings.json", "r") as file:
+    SETTINGS = json.load(file)
+with open("bodies.json", "r") as file:
+    BODIES = json.load(file)
+
+#SETUP WINDOW
+FPS = SETTINGS["Screen"]["FPS"]
+WIN = pg.display.set_mode((SETTINGS["Screen"]["Width"], SETTINGS["Screen"]["Height"]), pg.RESIZABLE)
+pg.display.set_caption(SETTINGS["Screen"]["Title"])
 
 
-class star():
-    instances = []
-    def __init__(self, size, x, y, colour):
-        self.__class__.instances.append(self)
-        self.size = size
-        self.x = x
-        self.y = y
-        self.colour = colour
+class MoveableCameraGroup(pg.sprite.Group):
+    """
+    SPRITE GROUP SUBCLASS TO HANDLE MOUSE INPUTS AS OFFSETS FOR A 'CAMERA'
+        - CLICK AND DRAG CAMERA
+        - SCROLL WHEEL ZOOM
+        - SPACE BAR TO RESET POSITIONS
+    """
+    def __init__(self, SETTINGS):
+        super().__init__()
+        self.SETTINGS       = SETTINGS
+        self.incriment_up   = SETTINGS["Scales"]["Incriments"]["Up"]
+        self.incriment_down = SETTINGS["Scales"]["Incriments"]["Down"]
+        
+        self.offset             = pg.math.Vector2() #TO APPLY TO SPRITES
+        self.clickstart_offset  = pg.math.Vector2() #NORMALISE AFTER CLICK
+        self.dragging           = False #WHEN TO APPLY OFFSET TO SPRITES
+        self.reset_scales()
+        
+        self.astroid_distance_start = BODIES["Asteroids"]["Distance"]["Start"]
+        self.astroid_distance_end   = BODIES["Asteroids"]["Distance"]["End"]
+    
+    def reset_scales(self):
+        self.scale_size     = SETTINGS["Scales"]["Size"]
+        self.scale_velocity = SETTINGS["Scales"]["Velocity"]
+        self.scale_distance = SETTINGS["Scales"]["Distance"]
+        self.offset.x       = 0
+        self.offset.y       = 0
+    
+    def scale(self, direction):
+        self.offset.x       *= direction
+        self.offset.y       *= direction
+        self.scale_size     *= direction
+        self.scale_velocity *= direction
+        self.scale_distance *= direction
+    
+    def camera_controller(self, event):
+        # IF LEFT MOUSE PRESSED
+        if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+            self.dragging = True
+            mouse_x, mouse_y = pg.mouse.get_pos()
+            self.clickstart_offset.x = self.offset.x - mouse_x
+            self.clickstart_offset.y = self.offset.y - mouse_y
+        
+        # IF LEFT MOUSE RELEASED
+        elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+            self.dragging = False
+        
+        # IF MOUSE MOVED WHILE LEFT MOUSE PRESSED
+        elif event.type == pg.MOUSEMOTION:
+            if self.dragging:
+                mouse_x, mouse_y = pg.mouse.get_pos()
+                self.offset.x = mouse_x + self.clickstart_offset.x
+                self.offset.y = mouse_y + self.clickstart_offset.y
+        
+        # IF MOUSE SCROLL WHEEL UP
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 4:
+            self.scale(self.incriment_up)
+        
+        # IF MOUSE SCROLL WHEEL DOWN
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 5:
+            self.scale(self.incriment_down)
+        
+        # IF SPACE BAR PRESSED
+        elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+            self.reset_scales()
+    
+    def create_sprites(self):
+        #CREATE BACKGROUND STARS USING FILE DATA
+        for i in range(0, BODIES["Background Stars"]["Count"]):
+            star(
+                self,
+                "Background Star",
+                1071000,
+                uniform(-5000,5000),
+                uniform(-5000,5000),
+                (255,255,255)
+            )
+        
+        #CREATE STARS FROM FILE
+        for i in BODIES["Stars"]:
+            i = BODIES["Stars"][i]
+            colour = (i["Colour"]["r"],i["Colour"]["g"],i["Colour"]["b"])
+            star(
+                self,
+                i["Name"],
+                i["Size"]/2,
+                i["Position"]["x"],
+                i["Position"]["y"],
+                colour
+            )
+        
+        #CREATE ASTEROID BELT USING FILE DATA
+        for i in range(0, BODIES["Asteroids"]["Count"]):
+            satellite(
+                self,
+                "Asteroid",
+                "Sun",
+                4007100,
+                self.generate_asteroid_distance(),
+                uniform(BODIES["Asteroids"]["Speed"]["Start"],BODIES["Asteroids"]["Speed"]["End"]),
+                (160,160,160)
+            )
+        
+        #CREATE PLANETS & MOONS FROM FILE
+        orbiters = ["Planets", "Moons"]
+        for orbiter in orbiters:
+            for i in BODIES[orbiter]:
+                i = BODIES[orbiter][i]
+                colour = (i["Colour"]["r"],i["Colour"]["g"],i["Colour"]["b"])
+                if orbiter == "Moons":
+                    #MOVES MOONS SLIGHTLY FURTHER OUT AND REVERSES ORBIT DIRECTION
+                    i["Distance"] *= 10
+                    i["Velocity"] *= -1
+                satellite(
+                    self,
+                    i["Name"],
+                    i["Orbits"],
+                    i["Size"],
+                    i["Distance"],
+                    i["Velocity"],
+                    colour
+                )
+    
+    def generate_asteroid_distance(self):
+        """
+        RETURNS THE DISTANCE FOR THE ASTEROIDS TO SPAWN AT AND REDUCED AREA AVAILABLE WITH EACH CREATION
+        FAVOURS A DENSE CENTER TO THE RING
+        """
+        position = uniform(self.astroid_distance_start,self.astroid_distance_end)
+        self.astroid_distance_start     += self.astroid_distance_start*0.00004
+        self.astroid_distance_end       -= self.astroid_distance_end*0.00004
+        return position
+    
+    def get_body_by_name(self, name):
+        """
+        SEARCHES ALL SPRITES IN THE SPRITE GROUP
+        AND RETURNS THE SPRITE WITH THE GIVEN NAME
+        """
+        for sprite in self:
+            if sprite.name == name:
+                return sprite
+        return False
 
-    def generate(self, WIN):
-        pg.draw.circle(WIN, self.colour, (self.x, self.y), self.size*10)
+class star(pg.sprite.Sprite):
+    def __init__(self, sprite_group, name, size, x, y, colour):
+        super().__init__(sprite_group)
+        self.sprite_group   = sprite_group
+        self.base_size      = size
+        self.base_radius    = 0
+        self.base_velocity  = 0
+        self.size           = self.base_size * self.sprite_group.scale_size
+        self.radius         = 0
+        self.velocity       = 0
+        
+        self.name           = name
+        self.x              = x
+        self.y              = y
+        self.colour         = colour
+        self.surface        = pg.display.get_surface()
+    
+    def update(self):
+        self.scale()
+        self.draw()
+    
+    def scale(self):
+        if self.name != "Background Star":
+            self.size     = self.base_size     * self.sprite_group.scale_size
+            self.velocity = self.base_velocity * self.sprite_group.scale_velocity
+            self.radius   = self.base_radius   * self.sprite_group.scale_distance
+    
+    def draw(self):
+        if self.name != "Background Star":
+            pos = (self.x + self.sprite_group.offset.x, self.y + self.sprite_group.offset.y)
+        else:
+            pos = (self.x + self.sprite_group.offset.x*0.3, self.y + self.sprite_group.offset.y*0.3)
+        pg.draw.circle(
+            self.surface,
+            self.colour,
+            pos,
+            self.size)
 
-class satellite():
-    instances = []
-    def __init__(self, parent, size, distance, velocity, colour):
-        self.__class__.instances.append(self)
-        self.size = size/3
-        self.radius = distance*70
-        self.velocity = velocity/10000
-        self.colour = colour
-        self.parent = parent
-        self.center_of_rotation_x = parent.x
-        self.center_of_rotation_y = parent.y
-        self.angle = radians(randrange(0,360))
+class satellite(star):
+    def __init__(self, sprite_group, name, parent_name, size, radius, velocity, colour):
+        super().__init__(sprite_group, name, size, 0, 0, colour)
+        self.base_radius    = radius
+        self.base_velocity  = velocity
+        self.radius         = self.base_radius * sprite_group.scale_distance
+        self.velocity       = self.base_velocity * sprite_group.scale_velocity
+        
+        self.parent         = sprite_group.get_body_by_name(parent_name)
+        self.center_of_rotation_x = self.parent.x
+        self.center_of_rotation_y = self.parent.y
+        self.angle = radians(uniform(0,360))
         self.x = self.center_of_rotation_x + self.radius * cos(self.angle)
         self.y = self.center_of_rotation_y - self.radius * sin(self.angle)
-
-    def calculateMovement(self, WIN):
-        self.center_of_rotation_x = self.parent.x #updates position of the body it's circling
-        self.center_of_rotation_y = self.parent.y
-        self.x = self.center_of_rotation_x + self.radius * cos(self.angle) # generate position based on what we're orbiting + our angle
-        self.y = self.center_of_rotation_y - self.radius * sin(self.angle)
-        pg.draw.circle(WIN, self.colour, (self.x, self.y), self.size*10) # draw to the screen
-        self.angle = self.angle + self.velocity # New angle, we add angular velocity
-        self.x = self.x + self.radius * self.velocity * cos(self.angle + pi / 2) # New x
-        self.y = self.y - self.radius * self.velocity * sin(self.angle + pi / 2) # New y
-
-
-sun = star(5, WIDTH/2, HEIGHT/2, (255,255,0))
-#Planets
-mercury = satellite(sun, 1, 1, -48, (219,206,202))
-venus = satellite(sun, 3, 2, 35, (150,131,150))
-earth = satellite(sun, 4, 3, 30, (0,0,205))
-mars = satellite(sun, 2, 4, -24, (193,68,14))
-jupiter = satellite(sun, 8, 6, 13, (227,110,75))
-saturn = satellite(sun, 7, 7, -10, (206,184,184))
-uranus = satellite(sun, 6, 8, -7, (213,251,252))
-neptune = satellite(sun, 5, 9, 5, (91,93,223))
-#Moons
-mercury_moon = satellite(mercury, 0.6, 0.1, 200, (150,131,150))
-venus_moon = satellite(venus, 0.8, 0.3, -180, (150,131,150))
-venus_moon = satellite(venus, 1, 0.4, 200, (150,131,150))
-earth_moon = satellite(earth, 0, 0.2, -300, (0,0,0))
-mars_moon = satellite(mars, 0.4, 0.25, -380, (150,131,150))
-mars_moon = satellite(mars, 0.7, 0.4, 240, (150,131,150))
-jupiter_moon = satellite(jupiter, 2, 0.6, 200, (150,131,150))
-jupiter_moon = satellite(jupiter, 1.4, 0.45, -380, (150,131,150))
-jupiter_moon = satellite(jupiter, 0.7, 0.6, 240, (150,131,150))
-saturn_moon = satellite(saturn, 2, 0.6, 200, (150,131,150))
-saturn_moon = satellite(saturn, 1.4, 0.45, -380, (150,131,150))
-uranus_moon = satellite(uranus, 2, 0.6, 200, (150,131,150))
-uranus_moon = satellite(uranus, 1.4, 0.45, -380, (150,131,150))
-uranus_moon = satellite(uranus, 0.7, 0.6, 240, (150,131,150))
-neptune_moon = satellite(neptune, 1.4, 0.45, -380, (150,131,150))
-neptune_moon = satellite(neptune, 0.7, 0.6, 240, (150,131,150))
-#Background Stars
-for i in range(0,200):
-    bg_stars = star(uniform(1.0,2.0)/10, randrange(0,WIDTH), randrange(0,HEIGHT), (randrange(220,255),randrange(220,255),randrange(220,255)))
-#Asteroid Belt
-for i in range(0,2000):
-    asteroid = satellite(sun, uniform(0.1,1.0), uniform(4.5, 5.2), randrange(20,22), (219,206,202))
+    
+    def update(self):
+        self.center_of_rotation_x, self.center_of_rotation_y = self.parent.x, self.parent.y
+        self.x = (self.center_of_rotation_x + self.radius * cos(self.angle))
+        self.y = (self.center_of_rotation_y - self.radius * sin(self.angle))
+        self.scale()
+        self.draw()
+        self.angle = self.angle + self.velocity
+        self.x = self.x + self.radius * self.velocity * cos(self.angle + pi / 2)
+        self.y = self.y - self.radius * self.velocity * sin(self.angle + pi / 2)
 
 
-if __name__ == '__main__':
+def run():
+    visible_sprites = MoveableCameraGroup(SETTINGS)
+    visible_sprites.create_sprites()
+    
     clock = pg.time.Clock()
     run = True
-    while run: # test if program has been quit
+    while run:
         clock.tick(FPS)
-
-        WIN.fill((0, 0, 0)) #Draw background
-        [star.generate(WIN) for star in star.instances] #Draw stars
-        [satellite.calculateMovement(WIN) for satellite in satellite.instances] #Draw satellites
-        pg.display.update() #Update screen
-
+        
+        WIN.fill((0, 0, 0))
+        visible_sprites.update()
+        pg.display.update()
+        
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
+            visible_sprites.camera_controller(event)
     quit()
+
+if __name__ == '__main__':
+    run()
