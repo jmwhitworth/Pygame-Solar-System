@@ -15,27 +15,6 @@ FPS = SETTINGS["Screen"]["FPS"]
 WIN = pg.display.set_mode((SETTINGS["Screen"]["Width"], SETTINGS["Screen"]["Height"]), pg.RESIZABLE)
 pg.display.set_caption(SETTINGS["Screen"]["Title"])
 
-
-class MoveableCameraGroup(pg.sprite.Group):
-    """
-    SPRITE GROUP SUBCLASS TO HANDLE MOUSE INPUTS AS OFFSETS FOR A 'CAMERA'
-        - CLICK AND DRAG CAMERA
-        - SCROLL WHEEL ZOOM
-        - SPACE BAR TO RESET POSITIONS
-    """
-    def __init__(self, SETTINGS):
-        super().__init__()
-        self.SETTINGS       = SETTINGS
-        self.incriment_up   = SETTINGS["Scales"]["Incriments"]["Up"]
-        self.incriment_down = SETTINGS["Scales"]["Incriments"]["Down"]
-        
-        self.offset             = pg.math.Vector2() #TO APPLY TO SPRITES
-        self.clickstart_offset  = pg.math.Vector2() #NORMALISE AFTER CLICK
-        self.dragging           = False #WHEN TO APPLY OFFSET TO SPRITES
-        self.reset_scales()
-        
-        self.astroid_distance_start = BODIES["Asteroids"]["Distance"]["Start"]
-        self.astroid_distance_end   = BODIES["Asteroids"]["Distance"]["End"]
     
     def reset_scales(self):
         self.scale_size     = SETTINGS["Scales"]["Size"]
