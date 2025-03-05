@@ -10,7 +10,6 @@ with open("settings.json", "r") as file:
     SETTINGS = json.load(file)
 with open("bodies.json", "r") as file:
     BODIES = json.load(file)
-print(BODIES)
 
 # SETUP WINDOW
 FPS = SETTINGS["Screen"]["FPS"]
@@ -50,11 +49,16 @@ class MoveableCameraGroup(pg.sprite.Group):
         self.offset.y = 0
 
     def scale(self, direction):
+        # Set a maximum outer zoom level
+        if (self.scale_size * direction) * 1000000 < 0.35:
+            return
+
         self.offset.x *= direction
         self.offset.y *= direction
         self.scale_size *= direction
         self.scale_velocity *= direction
         self.scale_distance *= direction
+        self.update()
 
     def camera_controller(self, event):
         # IF LEFT MOUSE PRESSED
