@@ -1,17 +1,17 @@
 {
-    "Screen": {
-        "Title":    "Solar System Simulation by Jack Whitworth",
+    "screen": {
+        "title":    "Solar System Simulation by Jack Whitworth",
         "FPS":      60,
-        "Width":    1280,
-        "Height":   720
+        "width":    1280,
+        "height":   720
     },
-    "Scales": {
-        "Size":     0.000001,
-        "Distance": 0.00000001,
-        "Velocity": 0.00000001,
-        "Incriments": {
-            "Up":   1.42,
-            "Down": 0.7
+    "scales": {
+        "size":     0.000001,
+        "distance": 0.00000002,
+        "velocity": 0.00000001,
+        "increments": {
+            "up":   1.42,
+            "down": 0.7
         }
     }
 }

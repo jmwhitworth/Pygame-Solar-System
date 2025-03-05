@@ -5,7 +5,18 @@ from .Star import Star
 
 
 class Satellite(Star):
-    def __init__(self, sprite_group, name, parent_name, size, radius, velocity, colour):
+    """A satellite object that orbits a parent body."""
+
+    def __init__(
+        self,
+        sprite_group,
+        name: str,
+        parent_name: str,
+        size: int,
+        radius: int | float,
+        velocity: int | float,
+        colour: tuple,
+    ):
         super().__init__(sprite_group, name, size, 0, 0, colour)
         self.base_radius = radius
         self.base_velocity = velocity
@@ -19,7 +30,8 @@ class Satellite(Star):
         self.x = self.center_of_rotation_x + self.radius * cos(self.angle)
         self.y = self.center_of_rotation_y - self.radius * sin(self.angle)
 
-    def update(self):
+    def update(self) -> None:
+        """Update the satellite's position based on the parent's position and it's own velocity and draw it"""
         self.center_of_rotation_x, self.center_of_rotation_y = (
             self.parent.x,
             self.parent.y,

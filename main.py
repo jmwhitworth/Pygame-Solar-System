@@ -3,19 +3,19 @@ import json
 
 import pygame as pg
 
-from sprites.CameraGroup import CameraGroup
+from classes.CameraGroup import CameraGroup
 
 with open("assets/settings.json", "r") as file:
     SETTINGS = json.load(file)
 with open("assets/bodies.json", "r") as file:
     BODIES = json.load(file)
 
-
-FPS = SETTINGS["Screen"]["FPS"]
+FPS = SETTINGS["screen"]["FPS"]
 WIN = pg.display.set_mode(
-    (SETTINGS["Screen"]["Width"], SETTINGS["Screen"]["Height"]), pg.RESIZABLE
+    (SETTINGS["screen"]["width"], SETTINGS["screen"]["height"]),
+    pg.RESIZABLE,
 )
-pg.display.set_caption(SETTINGS["Screen"]["Title"])
+pg.display.set_caption(SETTINGS["screen"]["title"])
 
 
 async def main():
@@ -32,8 +32,7 @@ async def main():
         pg.display.update()
 
         for event in pg.event.get():
-            if event.type == pg.QUIT:
-                run = False
+            run = event.type != pg.QUIT
             visible_sprites.camera_controller(event)
 
         await asyncio.sleep(0)
