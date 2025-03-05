@@ -10,11 +10,21 @@ A simulation of the solar system written with Python and Pygame
 - Asteroid count is dialed a lot lower than is realistic due to performance and they're individually larger than is realistic to keep them viewable. This is the only portion of the simulation that is not accurate to scale, however, the positions in which they spawn is accurate relative to the other planets.
 
 # Tech Stack
-1. [Python 3.10.4](https://www.python.org/)
-2. [Pygame 2.1.2](https://www.pygame.org/news)
+1. [Python 3.13](https://www.python.org/)
+2. [Pygame 2.6.1](https://www.pygame.org/news)
 
 # Sample
 Coming soon...
 
-# Notes
-No further development plans exist at this time, but if anybody wants to contribute by populating moons or other bodies I've missed that would be super helpful!
+# Building for web
+Pygbag is used for compiling the code into WebAssembly so it can be ran in the browser.
+
+First, you need to install all the dependencies:
+`poetry install`
+
+Then test is runs locally first:
+`poetry run python ./main.py`
+
+If everything's running as expected, then you can build the project:
+`poetry run pygbag .`
+> This must be ran from within the main directory where `main.py` exists, or you should replace the `.` with the path to that directory
