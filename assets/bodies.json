@@ -127,7 +127,7 @@
         }
     ],
     "asteroids": {
-        "count": 10000,
+        "count": 5000,
         "distance": {
             "start": 329115315520,
             "end": 478713186211

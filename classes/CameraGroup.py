@@ -2,6 +2,7 @@ from random import uniform
 
 import pygame as pg
 
+from .Button import ButtonGroup
 from .Satellite import Satellite
 from .Star import Star
 
@@ -46,15 +47,41 @@ class CameraGroup(pg.sprite.Group):
         self.clickstart_offset = pg.math.Vector2()
         self.dragging = False
 
-        self.reset_scales()
+        self.button_group = ButtonGroup()
+        self.button_group.add("Reset", self.reset)
+
+        self.reset()
         super().__init__()
 
-    def reset_scales(self):
-        self.scale_size = self.SETTINGS["scales"]["size"]
-        self.scale_velocity = self.SETTINGS["scales"]["velocity"]
-        self.scale_distance = self.SETTINGS["scales"]["distance"]
-        self.offset.x = 0
-        self.offset.y = 0
+    def update(self, *args, **kwargs) -> None:
+        """Update the sprites in the group"""
+        self.button_group.draw()
+        super().update(*args, **kwargs)
+
+    def set(self, size, velocity, distance, x, y) -> None:
+        self.scale_size = size
+        self.scale_velocity = velocity
+        self.scale_distance = distance
+        self.offset.x = x
+        self.offset.y = y
+
+    def reset(self):
+        self.set(
+            self.SETTINGS["scales"]["size"],
+            self.SETTINGS["scales"]["velocity"],
+            self.SETTINGS["scales"]["distance"],
+            0,
+            0,
+        )
+
+    def view(self, target: Satellite | Star) -> None:
+        self.set(
+            self.scale_size,
+            self.scale_velocity,
+            self.scale_distance,
+            target.x,
+            target.y,
+        )
 
     def scale(self, direction) -> None:
         # Set a maximum outer zoom level
@@ -66,9 +93,11 @@ class CameraGroup(pg.sprite.Group):
         self.scale_size *= direction
         self.scale_velocity *= direction
         self.scale_distance *= direction
-        self.update()  # Update after recalculating scales to ensure correct positions
+        self.update()
 
-    def camera_controller(self, event) -> None:
+    def handle_event(self, event) -> None:
+        self.button_group.handle_event(event)
+
         # Handle mouse events
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click
@@ -90,7 +119,7 @@ class CameraGroup(pg.sprite.Group):
             self.offset.y = self.clickstart_offset.y + mouse_y
 
         elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:  # Spacebar reset
-            self.reset_scales()
+            self.reset()
 
     def create_sprites(self) -> None:
         """Create the sprites for the group"""
@@ -112,7 +141,7 @@ class CameraGroup(pg.sprite.Group):
             )
 
         for star in self.BODIES["stars"]:
-            Star(
+            star_obj = Star(
                 self,
                 star["name"],
                 star["size"] / 2,
@@ -120,6 +149,7 @@ class CameraGroup(pg.sprite.Group):
                 star["position"]["y"],
                 (star["colour"]["r"], star["colour"]["g"], star["colour"]["b"]),
             )
+            self.button_group.add(star_obj.name, lambda: self.view(star_obj))
 
     def create_satellites(self) -> None:
         """Creates the planets and moons"""
@@ -127,7 +157,7 @@ class CameraGroup(pg.sprite.Group):
         for satellite_type in satellite_types:
             for planet in self.BODIES[satellite_type]:
                 parent = self.get_body_by_name(planet["orbits"])
-                Satellite(
+                satellite_obj = Satellite(
                     self,
                     planet["name"],
                     parent.name,
@@ -139,6 +169,9 @@ class CameraGroup(pg.sprite.Group):
                         planet["colour"]["g"],
                         planet["colour"]["b"],
                     ),
+                )
+                self.button_group.add(
+                    satellite_obj.name, lambda: self.view(satellite_obj)
                 )
 
     def create_asteroids(self) -> None:
