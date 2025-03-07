@@ -12,9 +12,27 @@ class CameraSurface(pygame.Surface):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.position: tuple[int | float, int | float] = (0, 0)
+        self.unzoomed_position: tuple[int | float, int | float] = (0, 0)
         self.half_width: int | float = self.get_width() / 2
         self.half_height: int | float = self.get_height() / 2
+
+        # Camera movement
+        self.dragging: bool = False
+        self.mouse_previous_position = pygame.Vector2(0, 0)
+
+        self.zoom = 1
+
+    @property
+    def position(self) -> tuple[int | float, int | float]:
+        """The current position of the CameraSurface, accounting for current zoom level"""
+        return (
+            self.unzoomed_position[0] * self.zoom,
+            self.unzoomed_position[1] * self.zoom,
+        )
+
+    @position.setter
+    def position(self, value: tuple[int | float, int | float]):
+        self.unzoomed_position = value
 
     @property
     def offset(self) -> tuple[int | float, int | float]:
@@ -32,8 +50,39 @@ class CameraSurface(pygame.Surface):
         Args:
             value (tuple[int | float, int | float]): The x and y values to move the CameraSurface by
         """
-        self.position = (self.position[0] + value[0], self.position[1] + value[1])
+        self.position = (
+            self.unzoomed_position[0] + value[0],
+            self.unzoomed_position[1] + value[1],
+        )
 
     def reset(self):
         """Resets the CameraSurface's position to the origin (0, 0)."""
         self.position = (0, 0)
+        self.zoom = 1
+
+    def handle_event(self, event: pygame.event.Event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Left click press
+                self.dragging = True
+                self.mouse_previous_position = pygame.mouse.get_pos()
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:  # Left click release
+                self.dragging = False
+
+        elif event.type == pygame.MOUSEMOTION and self.dragging:  # Mouse drag movement
+            mouse_current_position = pygame.mouse.get_pos()
+            delta = (
+                pygame.Vector2(self.mouse_previous_position)
+                - pygame.Vector2(mouse_current_position)
+            ) / self.zoom
+            self.transform(delta)
+            self.mouse_previous_position = mouse_current_position
+
+        elif event.type == pygame.MOUSEWHEEL:  # Mouse wheel for zoom
+            self.zoom += event.y * 0.1
+            self.zoom = max(0.3, self.zoom)
+
+        elif event.type == pygame.KEYDOWN:  # Reset camera with space key
+            if event.key == pygame.K_SPACE:
+                self.reset()

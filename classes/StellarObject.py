@@ -23,6 +23,7 @@ class StellarObject:
             int(data["colour"]["g"]),
             int(data["colour"]["b"]),
         )
+        self.zoom_level: int | float = 1
 
         # Orbit properties
         self.angle = radians(uniform(0, 360))
@@ -34,16 +35,13 @@ class StellarObject:
         self.y: int = 0
         self.calculate_orbit()
 
-        self.image = pygame.Surface((self.size, self.size))
-        self.image.set_colorkey((0, 0, 0))
-
     @classmethod
-    def create(cls, data: dict, scales: dict) -> "StellarObject":
+    def create_from_dictionary(cls, data: dict, scales: dict) -> "StellarObject":
         """Recursively creates StellarObject instances and their satellites"""
         stellar_body = cls(data, scales)
 
         for satellite_data in data.get("satellites", []):
-            satellite = cls.create(satellite_data, scales)
+            satellite = cls.create_from_dictionary(satellite_data, scales)
             satellite.parent = stellar_body
             stellar_body.satellites.add(satellite)
 
@@ -55,28 +53,35 @@ class StellarObject:
         centre_of_rotation_y = self.parent.y if self.parent else 0
         return centre_of_rotation_x, centre_of_rotation_y
 
-    def calculate_orbit(self) -> None:
+    def calculate_orbit(self, zoom: int | float = 1) -> None:
         centre_x, centre_y = self.centre_of_rotation
-        self.x = centre_x + self.distance * cos(self.angle)
-        self.y = centre_y - self.distance * sin(self.angle)
+        self.x = centre_x + (self.distance * zoom) * cos(self.angle)
+        self.y = centre_y - (self.distance * zoom) * sin(self.angle)
         self.angle += self.velocity
 
-    def update(self) -> None:
-        self.calculate_orbit()
-        [satellite.update() for satellite in self.satellites]
+    def update(self, zoom: int | float = 1) -> None:
+        self.zoom_level = zoom
+        self.calculate_orbit(zoom)
+        [satellite.update(zoom) for satellite in self.satellites]
 
     def draw(self, surface: pygame.Surface, offset: tuple[int, int] = (0, 0)) -> None:
+        zoomed_size = self.size * self.zoom_level
+
+        image = pygame.Surface((zoomed_size, zoomed_size))
+        image.set_colorkey((0, 0, 0))
+
         pygame.draw.circle(
-            self.image,
+            image,
             self.colour,
-            (self.size / 2, self.size / 2),
-            self.size / 2,
+            (zoomed_size / 2, zoomed_size / 2),
+            zoomed_size / 2,
         )
+
         surface.blit(
-            self.image,
+            image,
             (
-                (self.x - (self.size / 2)) + offset[0],
-                (self.y - (self.size / 2)) + offset[1],
+                (self.x - (zoomed_size / 2)) + offset[0],
+                (self.y - (zoomed_size / 2)) + offset[1],
             ),
         )
 

@@ -1,12 +1,12 @@
 {
     "star": {
-        "distance": 0.000000002,
-        "velocity": 0.00000002,
-        "size": 0.0000001
+        "distance": 0.00000002,
+        "velocity": 0.00000001,
+        "size": 0.000002
     },
     "planet": {
-        "distance": 0.000000002,
-        "velocity": 0.00000002,
+        "distance": 0.00000002,
+        "velocity": 0.00000001,
         "size": 0.000002
     },
     "moon": {

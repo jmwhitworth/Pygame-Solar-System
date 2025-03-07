@@ -21,7 +21,7 @@ class SolarSystem:
         self.focus: Optional[StellarObject] = None
         self.surface = CameraSurface(self.screen.get_size())
 
-        self.main_body: StellarObject = StellarObject.create(
+        self.main_body: StellarObject = StellarObject.create_from_dictionary(
             self.bodies,
             self.scales,
         )
@@ -31,7 +31,7 @@ class SolarSystem:
         self.screen.blit(self.surface, (0, 0))
         self.surface.fill((0, 0, 0))
 
-        self.main_body.update()
+        self.main_body.update(self.surface.zoom)
         self.main_body.draw(self.surface, self.surface.offset)
 
         if self.focus:
@@ -39,21 +39,4 @@ class SolarSystem:
 
     def handle_events(self, event: pygame.event.Event) -> None:
         """Handles events for the SolarSystem"""
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
-                self.focus = None
-                self.surface.transform((0, -50))
-            elif event.key == pygame.K_s:
-                self.focus = None
-                self.surface.transform((0, 50))
-            elif event.key == pygame.K_a:
-                self.focus = None
-                self.surface.transform((-50, 0))
-            elif event.key == pygame.K_d:
-                self.focus = None
-                self.surface.transform((50, 0))
-            elif event.key == pygame.K_SPACE:
-                self.focus = None
-                self.surface.reset()
-            elif event.key == pygame.K_1:
-                self.focus = random.choice(list(self.main_body.satellites))
+        self.surface.handle_event(event)

@@ -43,9 +43,10 @@ async def main() -> None:
         debug(f"FPS: {int(clock.get_fps())}")
         debug(f"Delta Time: {delta_time}", y=30)
         debug(
-            f"position: {round(solar_system.surface.position[0], 2)} x {round(solar_system.surface.position[1], 2)}",
+            f"position: {round(solar_system.surface.unzoomed_position[0], 2)} x {round(solar_system.surface.unzoomed_position[1], 2)}",
             y=50,
         )
+        debug(f"zoom: x{round(solar_system.surface.zoom, 2)}", y=70)
 
         x += 50 * delta_time
 
