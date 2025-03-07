@@ -1,62 +1,59 @@
 import asyncio
 import json
 
-import pygame as pg
+import pygame
 
-from classes.CameraGroup import CameraGroup
-
-with open("assets/settings.json", "r") as file:
-    SETTINGS = json.load(file)
-with open("assets/bodies.json", "r") as file:
-    BODIES = json.load(file)
-
-FPS = SETTINGS["screen"]["FPS"]
-WIN = pg.display.set_mode(
-    (SETTINGS["screen"]["width"], SETTINGS["screen"]["height"]),
-    pg.RESIZABLE,
-)
-pg.display.set_caption(SETTINGS["screen"]["title"])
-
-
-font = pg.font.Font(None, 24)
+from classes.SolarSystem import SolarSystem
 
 
 def debug(info, y=10, x=10):
     """Temporary debug function"""
-    display_surface = pg.display.get_surface()
+    pygame.font.init()
+    font = pygame.font.Font(None, 24)
+    display_surface = pygame.display.get_surface()
     debug_surf = font.render(str(info), True, "white")
     debug_rect = debug_surf.get_rect(topleft=(x, y))
-    pg.draw.rect(display_surface, "Black", debug_rect)
+    pygame.draw.rect(display_surface, "Black", debug_rect)
     display_surface.blit(debug_surf, debug_rect)
 
 
-async def main():
-    visible_sprites = CameraGroup(SETTINGS, BODIES)
-    visible_sprites.create_sprites()
+async def main() -> None:
+    with open("assets/settings.json", "r") as file:
+        settings: dict = json.load(file)
+    with open("assets/bodies.json", "r") as file:
+        bodies: dict = json.load(file)
 
-    clock = pg.time.Clock()
+    FPS = settings["screen"]["FPS"]
+    WIN = pygame.display.set_mode(
+        (settings["screen"]["width"], settings["screen"]["height"]),
+        pygame.RESIZABLE,
+    )
+    pygame.display.set_caption(settings["screen"]["title"])
+
+    clock = pygame.time.Clock()
+    solar_system = SolarSystem(bodies)
+
+    delta_time = 0.1
+    x = 0
     run = True
     while run:
-        clock.tick(FPS)
+        solar_system.tick()
+        debug(f"FPS: {int(clock.get_fps())}")
 
-        WIN.fill((0, 0, 0))
-        visible_sprites.update()
+        x += 50 * delta_time
 
-        debug(f"FPS: {int(clock.get_fps())}", 10, SETTINGS["screen"]["width"] - 100)
-        debug(
-            f"FPS: {int(visible_sprites.offset.x)} x {int(visible_sprites.offset.y)}",
-            42,
-            SETTINGS["screen"]["width"] - 200,
-        )
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            solar_system.handle_events(event)
 
-        pg.display.update()
+        pygame.display.update()
 
-        for event in pg.event.get():
-            run = event.type != pg.QUIT
-            visible_sprites.handle_event(event)
-
+        delta_time = clock.tick(FPS) / 1000
+        delta_time = max(0.001, min(0.1, delta_time))
         await asyncio.sleep(0)
     quit()
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

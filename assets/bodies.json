@@ -1,143 +1,124 @@
 {
-    "stars": [
-        {
-            "name": "Sun",
-            "size": 696340000,
-            "position": {
-                "x": 640,
-                "y": 360
+    "milkyway": {
+        "name": "Sun",
+        "size": 696340000,
+        "distance": 0,
+        "velocity": 0,
+        "colour": {
+            "r": 252,
+            "g": 229,
+            "b": 112
+        },
+        "satellites": [
+            {
+                "name": "Mercury",
+                "size": 4876312,
+                "distance": 50020000000,
+                "velocity": 112000,
+                "colour": {
+                    "r": 219,
+                    "g": 206,
+                    "b": 202
+                },
+                "satellites": []
             },
-            "colour": {
-                "r": 252,
-                "g": 229,
-                "b": 112
+            {
+                "name": "Venus",
+                "size": 4876312,
+                "distance": 108020000000,
+                "velocity": 78337,
+                "colour": {
+                    "r": 165,
+                    "g": 124,
+                    "b": 27
+                },
+                "satellites": []
+            },
+            {
+                "name": "Earth",
+                "size": 6371000,
+                "distance": 152020000000,
+                "velocity": 67000,
+                "colour": {
+                    "r": 50,
+                    "g": 50,
+                    "b": 250
+                },
+                "satellites": [
+                    {
+                        "name": "Moon",
+                        "size": 1737400,
+                        "distance": 384400000,
+                        "velocity": 2300,
+                        "colour": {
+                            "r": 50,
+                            "g": 50,
+                            "b": 50
+                        },
+                        "satellites": []
+                    }
+                ]
+            },
+            {
+                "name": "Mars",
+                "size": 3389500,
+                "distance": 208790000000,
+                "velocity": 53853,
+                "colour": {
+                    "r": 173,
+                    "g": 98,
+                    "b": 66
+                },
+                "satellites": []
+            },
+            {
+                "name": "Jupiter",
+                "size": 69911000,
+                "distance": 742320000000,
+                "velocity": 29236,
+                "colour": {
+                    "r": 64,
+                    "g": 68,
+                    "b": 54
+                },
+                "satellites": []
+            },
+            {
+                "name": "Saturn",
+                "size": 58232000,
+                "distance": 1475200000000,
+                "velocity": 21675,
+                "colour": {
+                    "r": 250,
+                    "g": 229,
+                    "b": 191 
+                },
+                "satellites": []
+            },
+            {
+                "name": "Uranus",
+                "size": 52362000,
+                "distance": 2945400000000,
+                "velocity": 15233,
+                "colour": {
+                    "r": 79,
+                    "g": 208,
+                    "b": 231
+                },
+                "satellites": []
+            },
+            {
+                "name": "Neptune",
+                "size": 24622000,
+                "distance": 4474100000000,
+                "velocity": 12146,
+                "colour": {
+                    "r": 41,
+                    "g": 144,
+                    "b": 181
+                },
+                "satellites": []
             }
-        }
-    ],
-    "planets": [
-        {
-            "name": "Mercury",
-            "orbits": "Sun",
-            "size": 4876312,
-            "distance": 50020000000,
-            "velocity": 112000,
-            "colour": {
-                "r": 219,
-                "g": 206,
-                "b": 202
-            }
-        },
-        {
-            "name": "Venus",
-            "orbits": "Sun",
-            "size": 4876312,
-            "distance": 108020000000,
-            "velocity": 78337,
-            "colour": {
-                "r": 165,
-                "g": 124,
-                "b": 27
-            }
-        },
-        {
-            "name": "Earth",
-            "orbits": "Sun",
-            "size": 6371000,
-            "distance": 152020000000,
-            "velocity": 67000,
-            "colour": {
-                "r": 50,
-                "g": 50,
-                "b": 250
-            }
-        },
-        {
-            "name": "Mars",
-            "orbits": "Sun",
-            "size": 3389500,
-            "distance": 208790000000,
-            "velocity": 53853,
-            "colour": {
-                "r": 173,
-                "g": 98,
-                "b": 66
-            }
-        },
-        {
-            "name": "Jupiter",
-            "orbits": "Sun",
-            "size": 69911000,
-            "distance": 742320000000,
-            "velocity": 29236,
-            "colour": {
-                "r": 64,
-                "g": 68,
-                "b": 54
-            }
-        },
-        {
-            "name": "Saturn",
-            "orbits": "Sun",
-            "size": 58232000,
-            "distance": 1475200000000,
-            "velocity": 21675,
-            "colour": {
-                "r": 250,
-                "g": 229,
-                "b": 191 
-            }
-        },
-        {
-            "name": "Uranus",
-            "orbits": "Sun",
-            "size": 52362000,
-            "distance": 2945400000000,
-            "velocity": 15233,
-            "colour": {
-                "r": 79,
-                "g": 208,
-                "b": 231
-            }
-        },
-        {
-            "name": "Neptune",
-            "orbits": "Sun",
-            "size": 24622000,
-            "distance": 4474100000000,
-            "velocity": 12146,
-            "colour": {
-                "r": 41,
-                "g": 144,
-                "b": 181
-            }
-        }
-    ],
-    "moons": [
-        {
-            "name": "Moon",
-            "orbits": "Earth",
-            "size": 1737400,
-            "distance": 384400000,
-            "velocity": 2300,
-            "colour": {
-                "r": 50,
-                "g": 50,
-                "b": 50
-            }
-        }
-    ],
-    "asteroids": {
-        "count": 5000,
-        "distance": {
-            "start": 329115315520,
-            "end": 478713186211
-        },
-        "speed": {
-            "start": 67000,
-            "end": 112000
-        }
-    },
-    "background_stars": {
-        "count": 1000
+        ]
     }
 }
