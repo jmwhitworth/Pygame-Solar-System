@@ -5,14 +5,19 @@ import pygame
 
 
 class StellarObject:
+    all: set["StellarObject"] = set()
+
     def __init__(self, data: dict, scales: dict) -> None:
+        StellarObject.all.add(self)
+
         # Relationships
         self.parent: "StellarObject" = None
         self.satellites: set["StellarObject"] = set()
 
         # Properties
         self.name: str = data["name"]
-        self.size: float = round(data["size"] * scales["size"], 4)
+        self.scale: dict = scales[data["type"]]
+        self.size: float = data["size"] * self.scale["size"]
         self.colour: tuple[int, int, int] = (
             int(data["colour"]["r"]),
             int(data["colour"]["g"]),
@@ -21,8 +26,8 @@ class StellarObject:
 
         # Orbit properties
         self.angle = radians(uniform(0, 360))
-        self.distance: float = round(data["distance"] * scales["distance"], 4)
-        self.velocity: float = round(data["velocity"] * scales["velocity"], 4)
+        self.distance: float = data["distance"] * self.scale["distance"]
+        self.velocity: float = data["velocity"] * self.scale["velocity"]
 
         # Position
         self.x: int = 0

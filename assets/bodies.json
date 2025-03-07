@@ -1,6 +1,7 @@
 {
     "milkyway": {
         "name": "Sun",
+        "type": "star",
         "size": 696340000,
         "distance": 0,
         "velocity": 0,
@@ -12,6 +13,7 @@
         "satellites": [
             {
                 "name": "Mercury",
+                "type": "planet",
                 "size": 4876312,
                 "distance": 50020000000,
                 "velocity": 112000,
@@ -24,6 +26,7 @@
             },
             {
                 "name": "Venus",
+                "type": "planet",
                 "size": 4876312,
                 "distance": 108020000000,
                 "velocity": 78337,
@@ -36,6 +39,7 @@
             },
             {
                 "name": "Earth",
+                "type": "planet",
                 "size": 6371000,
                 "distance": 152020000000,
                 "velocity": 67000,
@@ -46,7 +50,8 @@
                 },
                 "satellites": [
                     {
-                        "name": "Moon",
+                        "name": "Lunar",
+                        "type": "moon",
                         "size": 1737400,
                         "distance": 384400000,
                         "velocity": 2300,
@@ -61,6 +66,7 @@
             },
             {
                 "name": "Mars",
+                "type": "planet",
                 "size": 3389500,
                 "distance": 208790000000,
                 "velocity": 53853,
@@ -73,6 +79,7 @@
             },
             {
                 "name": "Jupiter",
+                "type": "planet",
                 "size": 69911000,
                 "distance": 742320000000,
                 "velocity": 29236,
@@ -85,6 +92,7 @@
             },
             {
                 "name": "Saturn",
+                "type": "planet",
                 "size": 58232000,
                 "distance": 1475200000000,
                 "velocity": 21675,
@@ -97,6 +105,7 @@
             },
             {
                 "name": "Uranus",
+                "type": "planet",
                 "size": 52362000,
                 "distance": 2945400000000,
                 "velocity": 15233,
@@ -109,6 +118,7 @@
             },
             {
                 "name": "Neptune",
+                "type": "planet",
                 "size": 24622000,
                 "distance": 4474100000000,
                 "velocity": 12146,

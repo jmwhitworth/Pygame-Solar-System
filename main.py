@@ -22,16 +22,18 @@ async def main() -> None:
         settings: dict = json.load(file)
     with open("assets/bodies.json", "r") as file:
         bodies: dict = json.load(file)
+    with open("assets/scale.json", "r") as file:
+        scale: dict = json.load(file)
 
     FPS = settings["screen"]["FPS"]
-    WIN = pygame.display.set_mode(
+    pygame.display.set_mode(
         (settings["screen"]["width"], settings["screen"]["height"]),
         pygame.RESIZABLE,
     )
     pygame.display.set_caption(settings["screen"]["title"])
 
     clock = pygame.time.Clock()
-    solar_system = SolarSystem(bodies)
+    solar_system = SolarSystem("milkyway", bodies, scale)
 
     delta_time = 0.1
     x = 0
@@ -40,7 +42,10 @@ async def main() -> None:
         solar_system.tick()
         debug(f"FPS: {int(clock.get_fps())}")
         debug(f"Delta Time: {delta_time}", y=30)
-        debug(f"position: {solar_system.surface.offset}", y=50)
+        debug(
+            f"position: {round(solar_system.surface.position[0], 2)} x {round(solar_system.surface.position[1], 2)}",
+            y=50,
+        )
 
         x += 50 * delta_time
 

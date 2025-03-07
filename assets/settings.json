@@ -4,14 +4,5 @@
         "FPS":      60,
         "width":    1280,
         "height":   720
-    },
-    "scales": {
-        "size":     0.000001,
-        "distance": 0.00000002,
-        "velocity": 0.000000005,
-        "increments": {
-            "up":   1.42,
-            "down": 0.7
-        }
     }
 }
