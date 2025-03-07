@@ -1,15 +1,21 @@
 import pygame
 
-from .StellarBody import StellarBody
+from .StellarObject import StellarObject
 
 
 class SolarSystem:
-    """Class which collects all StellarBody instances and manages their updates and drawing"""
+    """Class which collects all StellarObject instances and manages their updates and drawing"""
+
+    scale: float = 0.000001
 
     def __init__(self, bodies: dict) -> None:
         self.screen = pygame.display.get_surface()
         self.surface = pygame.Surface(self.screen.get_size())
-        self.main_body = StellarBody.create(bodies["milkyway"])
+
+        self.main_body: StellarObject = StellarObject.create(
+            bodies["milkyway"],
+            SolarSystem.scale,
+        )
 
         # Used as a 'camera' to move the SolarSystem around
         self.x: int = 0
@@ -27,6 +33,7 @@ class SolarSystem:
         """Updates and draws the SolarSystem"""
         self.screen.blit(self.surface, (0, 0))
         self.surface.fill((0, 0, 0))
+
         self.main_body.update()
         self.main_body.draw(self.surface, self.offset)
 
@@ -35,10 +42,13 @@ class SolarSystem:
         print(type(event))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                self.y += 50
-            if event.key == pygame.K_s:
                 self.y -= 50
-            if event.key == pygame.K_a:
-                self.x += 50
-            if event.key == pygame.K_d:
+            elif event.key == pygame.K_s:
+                self.y += 50
+            elif event.key == pygame.K_a:
                 self.x -= 50
+            elif event.key == pygame.K_d:
+                self.x += 50
+            elif event.key == pygame.K_SPACE:
+                self.x = 0
+                self.y = 0

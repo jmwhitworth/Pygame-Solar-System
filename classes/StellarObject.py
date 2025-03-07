@@ -1,9 +1,9 @@
 import pygame
 
 
-class StellarBody:
-    parent: "StellarBody"
-    satellites: set["StellarBody"]
+class StellarObject:
+    parent: "StellarObject"
+    satellites: set["StellarObject"]
 
     name: str
     size: int
@@ -13,15 +13,14 @@ class StellarBody:
     x: int = 0
     y: int = 0
 
-    scale: float = 0.000001
     image: pygame.Surface
 
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: dict, scale: float) -> None:
         self.satellites = set()
         self.name = data["name"]
-        self.size = data["size"] * self.scale
-        self.distance = data["distance"] * self.scale
-        self.velocity = data["velocity"] * self.scale
+        self.size = data["size"] * scale
+        self.distance = data["distance"] * scale
+        self.velocity = data["velocity"] * scale
         self.colour = (
             data["colour"]["r"],
             data["colour"]["g"],
@@ -32,12 +31,12 @@ class StellarBody:
         self.image.set_colorkey((0, 0, 0))
 
     @classmethod
-    def create(cls, data: dict) -> "StellarBody":
-        """Recursively creates StellarBody instances and their satellites"""
-        stellar_body = cls(data)
+    def create(cls, data: dict, scale: float) -> "StellarObject":
+        """Recursively creates StellarObject instances and their satellites"""
+        stellar_body = cls(data, scale)
 
         for satellite_data in data.get("satellites", []):
-            stellar_body.satellites.add(cls.create(satellite_data))
+            stellar_body.satellites.add(cls.create(satellite_data, scale))
 
         return stellar_body
 

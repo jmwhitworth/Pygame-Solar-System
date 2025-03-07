@@ -39,6 +39,8 @@ async def main() -> None:
     while run:
         solar_system.tick()
         debug(f"FPS: {int(clock.get_fps())}")
+        debug(f"Delta Time: {delta_time}", y=30)
+        debug(f"position: {solar_system.x}, {solar_system.y}", y=50)
 
         x += 50 * delta_time
 
