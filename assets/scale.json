@@ -13,5 +13,10 @@
         "distance": 0.00000006,
         "velocity": 0.000005,
         "size": 0.000003
+    },
+    "asteroid": {
+        "distance": 0.00000002,
+        "velocity": 0.000000005,
+        "size": 0.000002
     }
 }

@@ -10,14 +10,15 @@ class StellarObject:
 
     def __init__(self, data: dict, scales: dict) -> None:
         StellarObject.all_set.add(self)
-        StellarObject.all_hashmap[data["name"]] = self
+        if name := data.get("name"):
+            self.name: str = name
+            StellarObject.all_hashmap[name] = self
 
         # Relationships
         self.parent: "StellarObject" = None
         self.satellites: set["StellarObject"] = set()
 
         # Properties
-        self.name: str = data["name"]
         self.scale: dict = scales[data["type"]]
         self.size: float = data["size"] * self.scale["size"]
         self.colour: tuple[int, int, int] = (
@@ -64,7 +65,6 @@ class StellarObject:
     def update(self, zoom: int | float = 1) -> None:
         self.zoom_level = zoom
         self.calculate_orbit(zoom)
-        [satellite.update(zoom) for satellite in self.satellites]
 
     def draw(self, surface: pygame.Surface, offset: tuple[int, int] = (0, 0)) -> None:
         zoomed_size = self.size * self.zoom_level
@@ -87,4 +87,14 @@ class StellarObject:
             ),
         )
 
-        [satellite.draw(surface, offset) for satellite in self.satellites]
+    @staticmethod
+    def generate_asteroid_distance(
+        lower_range, upper_range
+    ) -> tuple[float, float, float]:
+        """Returns the distance for the asteroids to spawn at and reduces area available over time.
+        By reducing the area available, the asteroids will appear to be more dense towards the centre of the belt.
+        """
+        position = uniform(lower_range, upper_range)
+        lower_range += lower_range * 0.00004
+        upper_range -= upper_range * 0.00004
+        return (position, lower_range, upper_range)

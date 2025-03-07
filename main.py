@@ -24,6 +24,8 @@ async def main() -> None:
         settings: dict = json.load(file)
     with open("assets/bodies.json", "r") as file:
         bodies: dict = json.load(file)
+    with open("assets/asteroids.json", "r") as file:
+        asteroids: dict = json.load(file)
     with open("assets/scale.json", "r") as file:
         scale: dict = json.load(file)
 
@@ -35,7 +37,7 @@ async def main() -> None:
     pygame.display.set_caption(settings["title"])
 
     clock = pygame.time.Clock()
-    solar_system = SolarSystem("milkyway", bodies, scale)
+    solar_system = SolarSystem("milkyway", bodies, asteroids, scale)
 
     # Add UI menu
     buttons = ButtonGroup()

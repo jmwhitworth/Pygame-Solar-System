@@ -1,0 +1,20 @@
+{
+    "count": 5000,
+    "distance": {
+        "lower_range": 329115315520,
+        "upper_range": 478713186211
+    },
+    "size": {
+        "lower_range": 2000000,
+        "upper_range": 4007100
+    },
+    "velocity": {
+        "lower_range": 67000,
+        "upper_range": 112000
+    },
+    "colour": {
+        "r": 200,
+        "g": 200,
+        "b": 200
+    }
+}
