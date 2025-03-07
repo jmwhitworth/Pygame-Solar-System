@@ -1,33 +1,28 @@
+import random
+
 import pygame
 
+from .CameraSurface import CameraSurface
 from .StellarObject import StellarObject
 
 
 class SolarSystem:
     """Class which collects all StellarObject instances and manages their updates and drawing"""
 
-    scale: float = 0.000001
+    scales: dict = {
+        "distance": 0.00000001,
+        "velocity": 0.00000001,
+        "size": 0.000001,
+    }
 
     def __init__(self, bodies: dict) -> None:
         self.screen = pygame.display.get_surface()
-        self.surface = pygame.Surface(self.screen.get_size())
+        self.surface = CameraSurface(self.screen.get_size())
 
         self.main_body: StellarObject = StellarObject.create(
             bodies["milkyway"],
-            SolarSystem.scale,
+            SolarSystem.scales,
         )
-
-        # Used as a 'camera' to move the SolarSystem around
-        self.x: int = 0
-        self.y: int = 0
-
-    @property
-    def offset(self) -> tuple[int, int]:
-        """Returns the offset of the SolarSystem
-        the x and y coordinates are reversed to move the SolarSystem in the opposite direction
-        This means that setting x to 300, will have our 'camera' be positioned to look at that point
-        """
-        return -self.x, -self.y
 
     def tick(self) -> None:
         """Updates and draws the SolarSystem"""
@@ -35,20 +30,22 @@ class SolarSystem:
         self.surface.fill((0, 0, 0))
 
         self.main_body.update()
-        self.main_body.draw(self.surface, self.offset)
+        self.main_body.draw(self.surface, (self.surface.x, self.surface.y))
 
     def handle_events(self, event: pygame.event.Event) -> None:
         """Handles events for the SolarSystem"""
-        print(type(event))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                self.y -= 50
+                self.surface.transform((0, -50))
             elif event.key == pygame.K_s:
-                self.y += 50
+                self.surface.transform((0, 50))
             elif event.key == pygame.K_a:
-                self.x -= 50
+                self.surface.transform((-50, 0))
             elif event.key == pygame.K_d:
-                self.x += 50
+                self.surface.transform((50, 0))
             elif event.key == pygame.K_SPACE:
-                self.x = 0
-                self.y = 0
+                self.surface.reset()
+            elif event.key == pygame.K_1:
+                target = random.choice(list(self.main_body.satellites))
+                self.surface.x = target.x
+                self.surface.y = target.y
