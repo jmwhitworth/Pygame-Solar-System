@@ -1,9 +1,9 @@
 from contextlib import suppress
 
-import pygame as pg
+import pygame
 
-pg.init()
-font = pg.font.Font(None, 24)
+pygame.init()
+font = pygame.font.Font(None, 24)
 
 
 class Button:
@@ -43,7 +43,7 @@ class ButtonGroup:
     y: int = 16
 
     def __init__(self):
-        self.surface = pg.display.get_surface()
+        self.surface = pygame.display.get_surface()
 
     def add(self, text: str, callback=None):
         """Add a button to the group."""
@@ -60,12 +60,11 @@ class ButtonGroup:
     def draw(self):
         """Draw all buttons to the screen."""
         for button in self.buttons:
-            pg.draw.rect(button.surface, "Black", button.rect)
             self.surface.blit(button.surface, button.rect)
 
     def handle_event(self, event):
         """Handle click for all buttons."""
-        if event.type == pg.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 for button in self.buttons:
                     if button.rect.collidepoint(event.pos):

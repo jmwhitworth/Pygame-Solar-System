@@ -1,4 +1,3 @@
-import random
 from typing import Optional
 
 import pygame
@@ -35,8 +34,23 @@ class SolarSystem:
         self.main_body.draw(self.surface, self.surface.offset)
 
         if self.focus:
-            self.surface.position = (self.focus.x, self.focus.y)
+            # Set the camera's position to the body, accounting for the zoom level
+            self.surface.position = (
+                self.focus.x // self.surface.zoom,
+                self.focus.y // self.surface.zoom,
+            )
 
     def handle_events(self, event: pygame.event.Event) -> None:
         """Handles events for the SolarSystem"""
+        if event.type == pygame.MOUSEMOTION and self.surface.dragging:
+            self.set_focus(None)
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            self.set_focus(None)
         self.surface.handle_event(event)
+
+    def reset(self):
+        self.set_focus(None)
+        self.surface.reset()
+
+    def set_focus(self, body: StellarObject | None):
+        self.focus = body

@@ -20,7 +20,16 @@ class CameraSurface(pygame.Surface):
         self.dragging: bool = False
         self.mouse_previous_position = pygame.Vector2(0, 0)
 
-        self.zoom = 1
+        self._zoom = 1
+
+    @property
+    def zoom(self) -> float:
+        return self._zoom
+
+    @zoom.setter
+    def zoom(self, value: float):
+        """Ensures that the zoom is always rounded to the nearest 0.1"""
+        self._zoom = round(value, 1)
 
     @property
     def position(self) -> tuple[int | float, int | float]:
@@ -55,6 +64,16 @@ class CameraSurface(pygame.Surface):
             self.unzoomed_position[1] + value[1],
         )
 
+    def zoom_in(self):
+        """Zooms in the CameraSurface by 10%"""
+        self.zoom += 0.1
+        self.zoom = min(2.5, self.zoom)
+
+    def zoom_out(self):
+        """Zooms out the CameraSurface by 10%"""
+        self.zoom -= 0.1
+        self.zoom = max(0.3, self.zoom)
+
     def reset(self):
         """Resets the CameraSurface's position to the origin (0, 0)."""
         self.position = (0, 0)
@@ -80,8 +99,10 @@ class CameraSurface(pygame.Surface):
             self.mouse_previous_position = mouse_current_position
 
         elif event.type == pygame.MOUSEWHEEL:  # Mouse wheel for zoom
-            self.zoom += event.y * 0.1
-            self.zoom = max(0.3, self.zoom)
+            if event.y > 0:
+                self.zoom_in()
+            else:
+                self.zoom_out()
 
         elif event.type == pygame.KEYDOWN:  # Reset camera with space key
             if event.key == pygame.K_SPACE:

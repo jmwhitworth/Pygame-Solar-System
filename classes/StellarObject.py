@@ -5,10 +5,12 @@ import pygame
 
 
 class StellarObject:
-    all: set["StellarObject"] = set()
+    all_set: set["StellarObject"] = set()
+    all_hashmap: dict[str, "StellarObject"] = {}
 
     def __init__(self, data: dict, scales: dict) -> None:
-        StellarObject.all.add(self)
+        StellarObject.all_set.add(self)
+        StellarObject.all_hashmap[data["name"]] = self
 
         # Relationships
         self.parent: "StellarObject" = None

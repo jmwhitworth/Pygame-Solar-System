@@ -3,7 +3,9 @@ import json
 
 import pygame
 
+from classes.Button import ButtonGroup
 from classes.SolarSystem import SolarSystem
+from classes.StellarObject import StellarObject
 
 
 def debug(info, y=10, x=10):
@@ -25,28 +27,46 @@ async def main() -> None:
     with open("assets/scale.json", "r") as file:
         scale: dict = json.load(file)
 
-    FPS = settings["screen"]["FPS"]
+    FPS = settings["FPS"]
     pygame.display.set_mode(
-        (settings["screen"]["width"], settings["screen"]["height"]),
+        (settings["width"], settings["height"]),
         pygame.RESIZABLE,
     )
-    pygame.display.set_caption(settings["screen"]["title"])
+    pygame.display.set_caption(settings["title"])
 
     clock = pygame.time.Clock()
     solar_system = SolarSystem("milkyway", bodies, scale)
+
+    # Add UI menu
+    buttons = ButtonGroup()
+    buttons.add("Zoom +", solar_system.surface.zoom_in)
+    buttons.add("Zoom -", solar_system.surface.zoom_out)
+    buttons.add("Reset", solar_system.reset)
+    buttons.add("")
+    for body in solar_system.bodies["satellites"]:
+        buttons.add(
+            body["name"],
+            lambda body=StellarObject.all_hashmap[body["name"]]: solar_system.set_focus(
+                body
+            ),
+        )
 
     delta_time = 0.1
     x = 0
     run = True
     while run:
         solar_system.tick()
-        debug(f"FPS: {int(clock.get_fps())}")
-        debug(f"Delta Time: {delta_time}", y=30)
-        debug(
-            f"position: {round(solar_system.surface.unzoomed_position[0], 2)} x {round(solar_system.surface.unzoomed_position[1], 2)}",
-            y=50,
-        )
-        debug(f"zoom: x{round(solar_system.surface.zoom, 2)}", y=70)
+        buttons.draw()
+
+        if settings["debug"]:
+            debug(f"FPS: {int(clock.get_fps())}", x=100)
+            debug(f"Delta Time: {delta_time}", x=100, y=30)
+            debug(
+                f"position: {int(solar_system.surface.unzoomed_position[0])} x {int(solar_system.surface.unzoomed_position[1])}",
+                x=100,
+                y=50,
+            )
+            debug(f"zoom: x{round(solar_system.surface.zoom, 2)}", x=100, y=70)
 
         x += 50 * delta_time
 
@@ -54,6 +74,7 @@ async def main() -> None:
             if event.type == pygame.QUIT:
                 run = False
             solar_system.handle_events(event)
+            buttons.handle_event(event)
 
         pygame.display.update()
 
